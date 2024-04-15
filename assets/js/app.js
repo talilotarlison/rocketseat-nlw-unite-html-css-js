@@ -1,6 +1,8 @@
+// Importação do array de objeto dos usuarios;
+
 import participantes from './users.js';
 
-// Componente usuario que mostra na tela o usuriocadastrado;
+// Componente usuario que mostra na tela do usurio cadastrado;
 
 let componenteUsuarios = (participantes) => {
     let dataInscricaoFormatada = dayjs(Date.now()).to(participantes.dataInscricao);
@@ -12,37 +14,31 @@ let componenteUsuarios = (participantes) => {
                                     Confirmar Check-In. 
                                 </button>
 
-                            `
+                                `
     }
 
     return (
         `
-    <tr>
-        <td>
-            <span>${participantes.nome}</span><br>         
-            <small>${participantes.email}</small>
-        </td>
-        <td>${dataInscricaoFormatada}</td>
-        <td>${dataCheckInFormatada}</td>
-    </tr>   
-    `
-
+            <tr>
+                <td>
+                    <span>${participantes.nome}</span><br>         
+                    <small>${participantes.email}</small>
+                </td>
+                <td>${dataInscricaoFormatada}</td>
+                <td>${dataCheckInFormatada}</td>
+            </tr>   
+             `
     );
-
-
-
 }
-
 
 // Função mostra todos os participantes na tela;
 
 let showParticipantes = (participantes) => {
     document.querySelector('tbody').innerHTML = ' ';
 
-    participantes.map(function (participante) {
+    participantes.map((participante)=>{
         document.querySelector('tbody').innerHTML += componenteUsuarios(participante);
     });
-
 }
 
 // Cancelar o evento de recarregar pagina pelo botao;
@@ -51,24 +47,23 @@ const btn = document.querySelector(".btn");
 
 btn.addEventListener("click", (event) => {
 
-    // Cancelar o evento de recarregar pagina;
-    // https://developer.mozilla.org/pt-BR/docs/Web/API/Event/preventDefault 
-
+    /* Cancelar o evento de recarregar pagina;
+     * https://developer.mozilla.org/pt-BR/docs/Web/API/Event/preventDefault 
+     */ 
     event.preventDefault();
 
-    // Usando formDate para pegar dados do formulario; 
-    // https://developer.mozilla.org/en-US/docs/Web/API/FormData/FormData
-
+    /* Usando formDate para pegar dados do formulario; 
+     * https://developer.mozilla.org/en-US/docs/Web/API/FormData/FormData
+     */
     getDadosParticipante();
 });
-
 
 // Pega os dados do usuario do formulario;
 
 let getDadosParticipante = () => {
     const form = document.querySelector(".formulario");
     const dadosDoFormulario = new FormData(form);
-
+    // Função que valida dados do usuario cadastrado;
     validarDadosForm(dadosDoFormulario.get('name'), dadosDoFormulario.get('email'));
 }
 
@@ -84,28 +79,47 @@ let limparCampo = () => {
     focoInput();
 }
 
-// Função alert na tela:
-// 'sucesso' - para sucesso; 
-// 'erro' - para Erro;   
+/* Função alert na tela para usuario;
+ * [sucesso] - Para sucesso; 
+ * [erro] - Para Erro no nome e Email;
+ * [erroNome] - Para Erro no nome; 
+ * [erroEmail] - Para Erro no Email;     
+ */
 
-let alertTela = (erro = "erro") => {
+let alertTela = (alert = "erro") => { 
     const divName = document.querySelector(".name");
     const divEmail = document.querySelector(".email");
 
-    // Uso do setAttribute em js;
-    // https://stackoverflow.com/questions/50960526/add-attribute-value-right-below-border-of-html-element-with-javascript-css
+    let corErro = "red";
+    let corSucesso = "aquamarine";
 
-    if (erro == "sucesso") {
-        divName.setAttribute("style", "border:2px; border-style:solid; border-color:aquamarine;");
-        divEmail.setAttribute("style", "border:2px; border-style:solid; border-color:aquamarine;");
-    } else if (erro == "erro") {
-        divName.setAttribute("style", "border:2px; border-style:solid; border-color:red;");
-        divEmail.setAttribute("style", "border:2px; border-style:solid; border-color:red;");
+    let alertTelaInput = (corName, corEmail)=>{
+        divName.setAttribute("style", `border:2px; border-style:solid; border-color:${corName};`);
+        divEmail.setAttribute("style", `border:2px; border-style:solid; border-color:${corEmail};`);
     }
+
+    /* Uso do setAttribute em js;
+     * https://stackoverflow.com/questions/50960526/add-attribute-value-right-below-border-of-html-element-with-javascript-css
+     */
+    if (alert == "sucesso") {
+       alertTelaInput(corSucesso,corSucesso);
+    } else if (alert == "erro") {
+       alertTelaInput(corErro,corErro);
+    }
+    else if (alert == "erroNome") {
+        alertTelaInput(corErro,corSucesso);
+     }
+     else if (alert == "erroEmail") {
+        alertTelaInput(corSucesso,corErro);
+     }
 
 }
 
-// função de foco no input;
+/* Função de foco no input;
+ * [nome] - para foco no nome
+ * [email] - para foco no email
+ *
+ */
 
 let focoInput = (foco = 'nome') => {
     const nome = document.querySelector("#name");
@@ -115,7 +129,6 @@ let focoInput = (foco = 'nome') => {
     } else if (foco == 'email') {
         email.focus();
     }
-
 }
 
 // Mensagem na tele do usuario;
@@ -134,29 +147,29 @@ let validarDadosForm = (nome, email) => {
         return;
     } else if (nome == '') {
         mensgemTela('Os campos nome não pode ser vazio!');
-        alertTela("erro");
+        alertTela("erroNome");
         focoInput();
         return;
     } else if (email == '') {
         mensgemTela('Os campos e-mail não pode ser vazio!');
-        alertTela("erro");
+        alertTela("erroEmail");
         focoInput('email');
         return;
     } else if (!validateEmail(email)) {
         mensgemTela('Informe um e-mail valido!');
-        alertTela("erro");
+        alertTela("erroEmail");
         focoInput('email');
         return;
     } else {
         adicionaParticipante(nome, email);
-
     }
 }
 
-// Validar email do usuario;
-// https://horadecodar.com.br/como-validar-email-com-javascript/
+/* Validar email do usuario;
+ * https://horadecodar.com.br/como-validar-email-com-javascript/
+ */
 
-function validateEmail(email) {
+let validateEmail = (email)=> {
     var re = /\S+@\S+\.\S+/;
     return re.test(email);
 }
@@ -172,7 +185,6 @@ let adicionaParticipante = (nome, email) => {
         dataCheckIn: null
     };
 
-
     // validar se email ja cadastrado no sistema;
 
     let buscaEmailUsuario = participantes.find((participante) => {
@@ -181,7 +193,7 @@ let adicionaParticipante = (nome, email) => {
     });
 
     if (buscaEmailUsuario) {
-        alert('E-mail ja cadastrado no sistema!')
+        mensgemTela('E-mail ja cadastrado no sistema!')
         limparCampo();
     } else {
         participantes.unshift(novoParticipante);
@@ -194,12 +206,9 @@ let adicionaParticipante = (nome, email) => {
 
 }
 
-
-
 // Suponha que todos os botões tenham a classe "meu-botao";
 
 let clickCheckInUser = () => {
-
 
     const botoes = document.querySelectorAll('.chek-in');
 
@@ -208,6 +217,11 @@ let clickCheckInUser = () => {
         botao.addEventListener('click', (e) => {
             // Lógica para manipular o clique do botão aqui;
             let emailChekIn = e.target.dataset.email;
+            let msgConfirme = 'Você deseja relmente confirmar o checkIn?';
+            // Validar se usuario quer fazer checkIn;
+            if(confirm(msgConfirme)==false){
+                return;
+            }
 
             var checkInUserNow = participantes.find((participante) => {
                 return participante.email == emailChekIn;
@@ -220,7 +234,6 @@ let clickCheckInUser = () => {
                 participantes.splice(indexToRemove, 1);
             }
 
-
             var user = {
                 nome: checkInUserNow.nome,
                 email: checkInUserNow.email,
@@ -228,20 +241,17 @@ let clickCheckInUser = () => {
                 dataCheckIn: Date.now()
             }
 
-            //console.log(user);
-
             participantes.unshift(user)
-
             showParticipantes(participantes);
             clickCheckInUser();
         });
     });
-
 }
 
-
-// https://github.com/rocketseat-education/nlw-unite-html-css-js/tree/main  
-
+/* 
+ * Link para o projeto original da Rocketseat;
+ * https://github.com/rocketseat-education/nlw-unite-html-css-js/tree/main  
+ */
 focoInput();
 showParticipantes(participantes);
 clickCheckInUser();
